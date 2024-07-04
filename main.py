@@ -2,7 +2,7 @@ import random
 
 def check_attendance(name):
     # Generate a random attendance value between 0 and 1
-    attendance = random.uniform(0, 1)
+    attendance = random.uniform(0, 1) > 0.5
     if attendance:
         print(f'Employee {name} is present')
     else:
