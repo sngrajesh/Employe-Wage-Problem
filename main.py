@@ -1,57 +1,91 @@
 import random
 
 class EmployeeAttendance:
-    WAGE_PER_HOUR = 20
-    FULL_DAY_HOUR = 8
-    PART_TIME_HOUR = 4
-    
     @staticmethod
     def check_attendance():
         """
-        Description : Generate Random number and check Employee is present or not 
-        Input : None
-        Output : {attendance} of 1 day
+        Description : Generate Random number and check employee is present or not
+        Input : Node
+        Output: {attendance} of 1 day (0: Full day, 1: Part time, 2: Absent)
         """
-        attendance = random.randint(0, 2)
-        return attendance
-    
-    @classmethod
-    def calculate_daily_wage(cls, attendance):
+        return random.randint(0, 2)
+
+    @staticmethod
+    def calculate_daily_wage(attendance, wage_per_hour, full_day_hours, part_time_hours):
         """
         Description : Calculate daily wage of employee based on their attendance
-        Input : {attendance} of one day
-        Output : {wage, hour} object calculated 
+        Input: attendance of one day, wage per hour, full day hours, part time hours
+        Output: {wage, hours} object
         """
+
         match attendance:
             case 0:
-                return {'wage': cls.WAGE_PER_HOUR * cls.FULL_DAY_HOUR, 'hour': 8}
+                return {'wage': wage_per_hour * full_day_hours, 'hours': full_day_hours}
             case 1:
-                return {'wage': cls.WAGE_PER_HOUR * cls.PART_TIME_HOUR, 'hour': 4}
+                return {'wage': wage_per_hour * part_time_hours, 'hours': part_time_hours}
             case _:
-                return {'wage': 0, 'hour': 0}
-    
+                return {'wage': 0, 'hours': 0}
+
     @classmethod
-    def monthly_wage_of_employee(cls):
+    def monthly_wage_of_employee(cls, company_name, wage_per_hour, working_days_per_month, max_hours_per_month, full_day_hours, part_time_hours):
         """
-        Description : Calculate monthly wage of employee based on their attendance and limit of working hour
-        Input : None 
-        Output : {monthly_wage} of month
+        Calculate monthly wage of employee based on their attendance and company-specific parameters
+        Input: company name, wage per hour, working days per month, max hours per month, full day hours, part time hours
+        Output: {monthly_wage, total_hours, company} of month
         """
+
         monthly_wage = 0
-        total_hour = 0
-        
-        for i in range(0, 20):
-            data = cls.calculate_daily_wage(cls.check_attendance())
-            monthly_wage += data['wage']
-            total_hour += data['hour']
-            if total_hour >= 100:
+        total_hours = 0
+
+        for _ in range(working_days_per_month):
+            if total_hours >= max_hours_per_month:
                 break
-        
-        return {'monthly_wage': monthly_wage, 'total_hour': total_hour}
+            
+            daily_data = cls.calculate_daily_wage(
+                cls.check_attendance(),
+                wage_per_hour,
+                full_day_hours,
+                part_time_hours
+            )
+            
+            monthly_wage += daily_data['wage']
+            total_hours += daily_data['hours']
 
+            if total_hours > max_hours_per_month:
+                total_hours = max_hours_per_month
+                monthly_wage = total_hours * wage_per_hour
+                break
 
+        return {
+            'monthly_wage': monthly_wage,
+            'total_hours': total_hours,
+            'company': company_name
+        }
+
+def main():
+    employee = EmployeeAttendance()
+    
+    companies = [
+        {
+            'name': 'BridgeLabz',
+            'wage_per_hour': 20,
+            'working_days_per_month': 22,
+            'max_hours_per_month': 100,
+            'full_day_hours': 8,
+            'part_time_hours': 4
+        }
+    ]
+    
+    for company in companies:
+        data = employee.monthly_wage_of_employee(
+            company['name'],
+            company['wage_per_hour'],
+            company['working_days_per_month'],
+            company['max_hours_per_month'],
+            company['full_day_hours'],
+            company['part_time_hours']
+        )
+        print(f"For {data['company']}: Wage is ${data['monthly_wage']} for {data['total_hours']} hours")
 
 if __name__ == "__main__":
-    employee = EmployeeAttendance()
-    data = employee.monthly_wage_of_employee()
-    print(f"Wage is {data['monthly_wage']} for {data['total_hour']}")
+    main()
