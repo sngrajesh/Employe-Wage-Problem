@@ -19,36 +19,42 @@ def calculate_daily_wage(attendance):
     """
     Description : Calcualate daily wage of employee based on their atendance on attendance
     Input : {attendance} of one day
-    Output : {waga} calculated 
+    Output : {wage, hour} object calculated 
     """
     match attendance:
         case 0:
-            return WAGE_PER_HOUR*FULL_DAY_HOUR
+            return {'wage' : WAGE_PER_HOUR*FULL_DAY_HOUR, 'hour' : 8}
         case 1:
-            return WAGE_PER_HOUR*PART_TIME_HOUR
+            return {'wage' : WAGE_PER_HOUR*PART_TIME_HOUR, 'hour' : 4}
         case _:
-            return 0  
+            return {'wage' : 0, 'hour' : 0}
 
 
 
 def monthly_wage_of_employee ():
     """
-    Description : Calcualate monthly wage of employee based on their atendance on attendance
+    Description : Calcualate monthly wage of employee based on their atendance on attendance and limit of working hour
     Input : None 
     Output : {monthly_wage} of month
     """
 
     monthly_wage = 0
-    for i in range(0,20):
-        monthly_wage += calculate_daily_wage(check_attendance())
+    total_hour = 0
     
-    return monthly_wage
+    for i in range(0,20):
+        data = calculate_daily_wage(check_attendance())
+        monthly_wage += data['wage']
+        total_hour += data['hour']
+        if(total_hour >= 100):
+            break
+
+    return {'monthly_wage' : monthly_wage,'total_hour':total_hour}
     
 
 
 name = input('Enter your name: ')
 if len(name) > 3 and name.isalpha():
-    monthly_wage = monthly_wage_of_employee()
-    print(f'{name} wage is {monthly_wage}')
+    data = monthly_wage_of_employee()
+    print(f"{name} wage is {data['monthly_wage']} for {data['total_hour']}")
 else:
     print('Enter a valid name')
